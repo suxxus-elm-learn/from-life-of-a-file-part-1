@@ -60,6 +60,26 @@ init =
     }
 
 
+getVideoAutoplaySettings : Autoplay -> AutoplaySettings
+getVideoAutoplaySettings autoplay =
+    case autoplay of
+        On ctrls ->
+            ctrls
+
+        Off ctrls ->
+            ctrls
+
+
+getVideoAutoplaySettingCtrlStatus : AutoplayCtrls -> AutoplaySettings -> Bool
+getVideoAutoplaySettingCtrlStatus ctrl autoplaySettings =
+    case ctrl of
+        AudioCtrl ->
+            autoplaySettings.audio
+
+        WithOutWifiCtrl ->
+            autoplaySettings.withoutwifi
+
+
 isVideoAutoplayOn : Model -> Bool
 isVideoAutoplayOn { videoAutoplay } =
     case videoAutoplay of
@@ -70,30 +90,10 @@ isVideoAutoplayOn { videoAutoplay } =
             False
 
 
-getAutoplaySettings : Autoplay -> AutoplaySettings
-getAutoplaySettings autoplay =
-    case autoplay of
-        On ctrls ->
-            ctrls
-
-        Off ctrls ->
-            ctrls
-
-
-getAutoplayCtrlValue : AutoplayCtrls -> AutoplaySettings -> Bool
-getAutoplayCtrlValue autoplayctrl autoplaySettings =
-    case autoplayctrl of
-        AudioCtrl ->
-            autoplaySettings.audio
-
-        WithOutWifiCtrl ->
-            autoplaySettings.withoutwifi
-
-
-getStatusOfAutoplayCtrl : Model -> AutoplayCtrls -> Bool
-getStatusOfAutoplayCtrl { videoAutoplay } ctrl =
-    getAutoplaySettings videoAutoplay
-        |> getAutoplayCtrlValue ctrl
+isAutoplaySettingCtrlChecked : Model -> AutoplayCtrls -> Bool
+isAutoplaySettingCtrlChecked { videoAutoplay } ctrl =
+    getVideoAutoplaySettings videoAutoplay
+        |> getVideoAutoplaySettingCtrlStatus ctrl
 
 
 toggleAutoplay : Model -> Autoplay
@@ -112,28 +112,25 @@ toggleAutoplayCtrls model ctrls =
         ctrlsSetting =
             case ctrls of
                 AudioCtrl ->
-                    { audio = not (getStatusOfAutoplayCtrl model AudioCtrl)
-                    , withoutwifi = getStatusOfAutoplayCtrl model WithOutWifiCtrl
+                    { audio = not (isAutoplaySettingCtrlChecked model AudioCtrl)
+                    , withoutwifi = isAutoplaySettingCtrlChecked model WithOutWifiCtrl
                     }
 
                 WithOutWifiCtrl ->
-                    { audio = getStatusOfAutoplayCtrl model AudioCtrl
-                    , withoutwifi = not (getStatusOfAutoplayCtrl model WithOutWifiCtrl)
+                    { audio = isAutoplaySettingCtrlChecked model AudioCtrl
+                    , withoutwifi = not (isAutoplaySettingCtrlChecked model WithOutWifiCtrl)
                     }
-
-        videoAutoplay =
-            case model.videoAutoplay of
-                Off _ ->
-                    Off ctrlsSetting
-
-                On _ ->
-                    On ctrlsSetting
     in
-    videoAutoplay
+    case model.videoAutoplay of
+        Off _ ->
+            Off ctrlsSetting
+
+        On _ ->
+            On ctrlsSetting
 
 
-listOfOptions : Model -> List Checkbox
-listOfOptions model =
+getCheckboxList : Model -> List Checkbox
+getCheckboxList model =
     [ { checked = model.emailNotifications
       , tag = "Email Notifications"
       , id = Email
@@ -145,13 +142,13 @@ listOfOptions model =
       , onClick = ToggleAutoplay
       }
     , { checked =
-            getStatusOfAutoplayCtrl model AudioCtrl
+            isAutoplaySettingCtrlChecked model AudioCtrl
       , tag = "Audio"
       , id = Audio
       , onClick = ToggleAutoplayCtrls AudioCtrl
       }
     , { checked =
-            getStatusOfAutoplayCtrl model WithOutWifiCtrl
+            isAutoplaySettingCtrlChecked model WithOutWifiCtrl
       , tag = "WithOutWifi"
       , id = Wifi
       , onClick = ToggleAutoplayCtrls WithOutWifiCtrl
@@ -181,14 +178,17 @@ dropAutoPlaySettings =
 tellUserOptions : Model -> List (Html Msg)
 tellUserOptions model =
     if isVideoAutoplayOn model then
-        listOfOptions model |> doHtmlCheckbox
+        getCheckboxList model
+            |> doHtmlCheckBoxList
 
     else
-        dropAutoPlaySettings (listOfOptions model) |> doHtmlCheckbox
+        getCheckboxList model
+            |> dropAutoPlaySettings
+            |> doHtmlCheckBoxList
 
 
-doHtmlCheckbox : List Checkbox -> List (Html Msg)
-doHtmlCheckbox =
+doHtmlCheckBoxList : List Checkbox -> List (Html Msg)
+doHtmlCheckBoxList =
     List.map
         (\checkbox ->
             li []
