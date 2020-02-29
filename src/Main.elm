@@ -181,18 +181,6 @@ dropAutoPlaySettings =
         )
 
 
-tellUserOptions : Model -> List (Html Msg)
-tellUserOptions model =
-    if isVideoAutoplayOn model then
-        getCheckboxList model
-            |> doHtmlCheckBoxList
-
-    else
-        getCheckboxList model
-            |> dropAutoPlaySettings
-            |> doHtmlCheckBoxList
-
-
 doHtmlCheckBoxList : List Checkbox -> List (Html Msg)
 doHtmlCheckBoxList =
     List.map
@@ -211,6 +199,18 @@ doHtmlCheckBoxList =
                     ]
                 ]
         )
+
+
+tellUserOptions : Model -> List (Html Msg)
+tellUserOptions model =
+    if isVideoAutoplayOn model then
+        getCheckboxList model
+            |> doHtmlCheckBoxList
+
+    else
+        getCheckboxList model
+            |> dropAutoPlaySettings
+            |> doHtmlCheckBoxList
 
 
 update : Msg -> Model -> Model
