@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, input, li, text, ul)
-import Html.Attributes exposing (checked, id, placeholder, type_)
+import Html exposing (Html, input, label, li, text, ul)
+import Html.Attributes exposing (checked, for, id, placeholder, type_)
 import Html.Events exposing (onClick)
 
 
@@ -58,6 +58,12 @@ init =
     , videoAutoplay = On { audio = False, withoutwifi = False }
     , useLocation = False
     }
+
+
+doId : String -> String
+doId id =
+    String.replace " " "-" id
+        |> String.toLower
 
 
 getVideoAutoplaySettings : Autoplay -> AutoplaySettings
@@ -197,10 +203,12 @@ doHtmlCheckBoxList =
                     , checked checkbox.checked
                     , placeholder checkbox.tag
                     , onClick checkbox.onClick
-                    , id checkbox.tag
+                    , id (doId checkbox.tag)
                     ]
                     []
-                , text checkbox.tag
+                , label [ for (doId checkbox.tag) ]
+                    [ text checkbox.tag
+                    ]
                 ]
         )
 
