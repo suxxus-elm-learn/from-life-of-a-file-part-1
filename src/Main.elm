@@ -174,15 +174,17 @@ audioSettingsCtlsFields =
     ]
 
 
+isAudioSettingsCtrlsFieldMember : Field -> Bool
+isAudioSettingsCtrlsFieldMember field =
+    List.member field audioSettingsCtlsFields
+
+
 dropAutoPlaySettings : List Checkbox -> List Checkbox
 dropAutoPlaySettings =
     List.filter
-        (\checkbox ->
+        (\{ id } ->
             not
-                (List.member
-                    checkbox.id
-                    audioSettingsCtlsFields
-                )
+                (isAudioSettingsCtrlsFieldMember id)
         )
 
 
@@ -190,14 +192,11 @@ doStyleForFields : Field -> Attribute msg
 doStyleForFields field =
     classList
         [ ( "ph4"
-          , List.member field
-                audioSettingsCtlsFields
+          , isAudioSettingsCtrlsFieldMember field
           )
         , ( "ph3"
           , not
-                (List.member field
-                    audioSettingsCtlsFields
-                )
+                (isAudioSettingsCtrlsFieldMember field)
           )
         , ( "tl pv2 bb b--light-silver pointer", True )
         ]
