@@ -32,10 +32,10 @@ type Msg
 
 
 type alias Checkbox =
-    { checked : Bool
+    { isChecked : Bool
     , tag : String
-    , id : Field
-    , onClick : Msg
+    , fieldId : Field
+    , handleClick : Msg
     }
 
 
@@ -137,32 +137,32 @@ toggleAutoplayCtrls model ctrls =
 
 getCheckboxList : Model -> List Checkbox
 getCheckboxList model =
-    [ { checked = model.emailNotifications
+    [ { isChecked = model.emailNotifications
       , tag = "Email Notifications"
-      , id = Email
-      , onClick = ToggleEmail
+      , fieldId = Email
+      , handleClick = ToggleEmail
       }
-    , { checked = isVideoAutoplayOn model
+    , { isChecked = isVideoAutoplayOn model
       , tag = "Video autoplay"
-      , id = Video
-      , onClick = ToggleAutoplay
+      , fieldId = Video
+      , handleClick = ToggleAutoplay
       }
-    , { checked =
+    , { isChecked =
             isAutoplaySettingCtrlChecked model AudioCtrl
       , tag = "Audio"
-      , id = Audio
-      , onClick = ToggleAutoplayCtrls AudioCtrl
+      , fieldId = Audio
+      , handleClick = ToggleAutoplayCtrls AudioCtrl
       }
-    , { checked =
+    , { isChecked =
             isAutoplaySettingCtrlChecked model WithOutWifiCtrl
       , tag = "WithOutWifi"
-      , id = Wifi
-      , onClick = ToggleAutoplayCtrls WithOutWifiCtrl
+      , fieldId = Wifi
+      , handleClick = ToggleAutoplayCtrls WithOutWifiCtrl
       }
-    , { checked = model.useLocation
+    , { isChecked = model.useLocation
       , tag = "Use location"
-      , id = Location
-      , onClick = ToggleLocation
+      , fieldId = Location
+      , handleClick = ToggleLocation
       }
     ]
 
@@ -182,9 +182,9 @@ isAudioSettingsCtrlsFieldMember field =
 dropAutoPlaySettings : List Checkbox -> List Checkbox
 dropAutoPlaySettings =
     List.filter
-        (\{ id } ->
+        (\{ fieldId } ->
             not
-                (isAudioSettingsCtrlsFieldMember id)
+                (isAudioSettingsCtrlsFieldMember fieldId)
         )
 
 
@@ -205,23 +205,23 @@ doStyleForFields field =
 doHtmlCheckBoxList : List Checkbox -> List (Html Msg)
 doHtmlCheckBoxList =
     List.map
-        (\checkbox ->
+        (\{ isChecked, tag, handleClick, fieldId } ->
             li
-                [ doStyleForFields checkbox.id
+                [ doStyleForFields fieldId
                 ]
                 [ input
                     [ type_ "checkbox"
-                    , checked checkbox.checked
-                    , placeholder checkbox.tag
-                    , onClick checkbox.onClick
-                    , id (doId checkbox.tag)
+                    , checked isChecked
+                    , placeholder tag
+                    , onClick handleClick
+                    , id (doId tag)
                     ]
                     []
                 , label
-                    [ for (doId checkbox.tag)
+                    [ for (doId tag)
                     , class "ph2"
                     ]
-                    [ text checkbox.tag
+                    [ text tag
                     ]
                 ]
         )
