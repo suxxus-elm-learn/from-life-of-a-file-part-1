@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, input, label, li, text, ul)
-import Html.Attributes exposing (checked, for, id, placeholder, type_)
+import Html exposing (Attribute, Html, div, form, h3, input, label, li, text, ul)
+import Html.Attributes exposing (checked, class, classList, for, id, placeholder, type_)
 import Html.Events exposing (onClick)
 
 
@@ -167,6 +167,13 @@ getCheckboxList model =
     ]
 
 
+audioSettingsCtlsFields : List Field
+audioSettingsCtlsFields =
+    [ Audio
+    , Wifi
+    ]
+
+
 dropAutoPlaySettings : List Checkbox -> List Checkbox
 dropAutoPlaySettings =
     List.filter
@@ -174,18 +181,35 @@ dropAutoPlaySettings =
             not
                 (List.member
                     checkbox.id
-                    [ Audio
-                    , Wifi
-                    ]
+                    audioSettingsCtlsFields
                 )
         )
+
+
+doStyleForFields : Field -> Attribute msg
+doStyleForFields field =
+    classList
+        [ ( "ph4"
+          , List.member field
+                audioSettingsCtlsFields
+          )
+        , ( "ph3"
+          , not
+                (List.member field
+                    audioSettingsCtlsFields
+                )
+          )
+        , ( "tl pv2 bb b--light-silver pointer", True )
+        ]
 
 
 doHtmlCheckBoxList : List Checkbox -> List (Html Msg)
 doHtmlCheckBoxList =
     List.map
         (\checkbox ->
-            li []
+            li
+                [ doStyleForFields checkbox.id
+                ]
                 [ input
                     [ type_ "checkbox"
                     , checked checkbox.checked
@@ -194,7 +218,10 @@ doHtmlCheckBoxList =
                     , id (doId checkbox.tag)
                     ]
                     []
-                , label [ for (doId checkbox.tag) ]
+                , label
+                    [ for (doId checkbox.tag)
+                    , class "ph2"
+                    ]
                     [ text checkbox.tag
                     ]
                 ]
@@ -231,8 +258,13 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    ul []
-        (tellUserOptions model)
+    div []
+        [ h3 [ class "f3 f3-m " ] [ text "Hello, select your options please" ]
+        , form []
+            [ ul [ class "list pl0 ml0 center mw5 ba b--light-silver br3" ]
+                (tellUserOptions model)
+            ]
+        ]
 
 
 main : Program () Model Msg
