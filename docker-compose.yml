@@ -1,0 +1,12 @@
+version: "0.1"
+name: from-life-of-file-part-1
+services:
+  Develop:
+    image: elm-app
+    build:
+      context: .
+    volumes:
+      - .:/app/elm-app
+    container_name: from-life-of-file-part-1
+    ports:
+      - 3501:3000
